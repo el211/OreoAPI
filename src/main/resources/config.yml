@@ -1,0 +1,23 @@
+mongo:
+  enabled: true
+  uri: "mongodb://localhost:27017"
+  database: "oreo_network"
+  appName: "OreoAPI"
+  connectTimeoutMs: 5000
+  serverSelectionTimeoutMs: 5000
+
+rabbit:
+  enabled: true
+  uri: "amqp://guest:guest@localhost:5672/"
+  exchange: "oreo.sync"
+  exchangeType: "topic"
+  clientName: "OreoAPI"
+  prefetch: 50
+
+sync:
+  enabled: true
+  serverId: "auto" # "auto" generates a random UUID and stores it in memory only.
+  publishJsonPretty: false
+
+logging:
+  debug: false
