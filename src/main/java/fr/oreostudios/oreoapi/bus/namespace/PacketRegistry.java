@@ -3,8 +3,10 @@ package fr.oreostudios.oreoapi.bus.namespace;
 
 import fr.oreostudios.oreoapi.bus.packet.Packet;
 
-import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -12,7 +14,7 @@ import java.util.function.Supplier;
  * Central registry for packet definitions.
  *
  * Responsibilities:
- * - maps Packet class <-> registry id
+ * - registryId <-> packet class
  * - supports static namespaces
  * - supports dynamic runtime registration
  *
@@ -22,11 +24,11 @@ import java.util.function.Supplier;
 public final class PacketRegistry {
 
     /** Packet class -> definition */
-    private final Map<Class<? extends Packet>, PacketDefinition<? extends Packet>> byClass =
+    private final ConcurrentMap<Class<? extends Packet>, PacketDefinition<? extends Packet>> byClass =
             new ConcurrentHashMap<>();
 
     /** Registry id -> definition */
-    private final Map<Long, PacketDefinition<?>> byId =
+    private final ConcurrentMap<Long, PacketDefinition<?>> byId =
             new ConcurrentHashMap<>();
 
     /** Namespace for dynamic registrations */
@@ -43,15 +45,39 @@ public final class PacketRegistry {
      * Register all packets from a namespace.
      */
     public void register(PacketNamespace namespace) {
+        Objects.requireNonNull(namespace, "namespace");
         namespace.registerInto(this);
     }
 
     /**
      * Register a single packet definition.
+     *
+     * @throws IllegalStateException if the registryId or packetClass is already registered
      */
     public <T extends Packet> void register(PacketDefinition<T> definition) {
-        byClass.put(definition.getPacketClass(), definition);
-        byId.put(definition.getRegistryId(), definition);
+        Objects.requireNonNull(definition, "definition");
+
+        // prevent silent overriding (very common source of "random" runtime bugs)
+        PacketDefinition<?> prevById = byId.putIfAbsent(definition.getRegistryId(), definition);
+        if (prevById != null) {
+            throw new IllegalStateException(
+                    "Duplicate registryId " + definition.getRegistryId()
+                            + " for " + definition.getPacketClass().getName()
+                            + " (already used by " + prevById.getPacketClass().getName() + ")"
+            );
+        }
+
+        PacketDefinition<? extends Packet> prevByClass =
+                byClass.putIfAbsent(definition.getPacketClass(), definition);
+
+        if (prevByClass != null) {
+            // rollback id insert to keep maps consistent
+            byId.remove(definition.getRegistryId(), definition);
+            throw new IllegalStateException(
+                    "Packet class already registered: " + definition.getPacketClass().getName()
+                            + " (existing id=" + prevByClass.getRegistryId() + ")"
+            );
+        }
     }
 
     /* -------------------------------------------------- */
@@ -65,28 +91,35 @@ public final class PacketRegistry {
      * - addons
      * - plugins
      * - optional modules
+     *
+     * If the class is already registered, this is a no-op.
      */
     public <T extends Packet> void register(
             Class<T> packetClass,
-            Supplier<T> constructor
+            Supplier<? extends T> constructor
     ) {
-        if (byClass.containsKey(packetClass)) {
-            return; // already registered
-        }
+        Objects.requireNonNull(packetClass, "packetClass");
+        Objects.requireNonNull(constructor, "constructor");
 
-        long id = nextDynamicId.getAndIncrement();
+        // Atomic, thread-safe: only one thread creates & installs the definition.
+        byClass.computeIfAbsent(packetClass, cls -> {
+            long id = nextDynamicId.getAndIncrement();
+            PacketProvider<T> provider = constructor::get;
 
-        PacketProvider<T> provider = constructor::get;
+            PacketDefinition<T> def = new PacketDefinition<>(
+                    id,
+                    packetClass,
+                    provider,
+                    dynamicNamespace
+            );
 
-        PacketDefinition<T> def = new PacketDefinition<>(
-                id,
-                packetClass,
-                provider,
-                dynamicNamespace
-        );
-
-        byClass.put(packetClass, def);
-        byId.put(id, def);
+            PacketDefinition<?> prev = byId.putIfAbsent(id, def);
+            if (prev != null) {
+                // should never happen unless nextDynamicId is reset externally
+                throw new IllegalStateException("Dynamic id collision: " + id);
+            }
+            return def;
+        });
     }
 
     /* -------------------------------------------------- */
@@ -98,7 +131,17 @@ public final class PacketRegistry {
     }
 
     public PacketDefinition<? extends Packet> getDefinition(Class<? extends Packet> packetClass) {
+        Objects.requireNonNull(packetClass, "packetClass");
         return byClass.get(packetClass);
+    }
+
+    public Optional<PacketDefinition<?>> findDefinition(long registryId) {
+        return Optional.ofNullable(byId.get(registryId));
+    }
+
+    public Optional<PacketDefinition<? extends Packet>> findDefinition(Class<? extends Packet> packetClass) {
+        Objects.requireNonNull(packetClass, "packetClass");
+        return Optional.ofNullable(byClass.get(packetClass));
     }
 
     /* -------------------------------------------------- */
@@ -110,6 +153,7 @@ public final class PacketRegistry {
     }
 
     public boolean isRegistered(Class<? extends Packet> packetClass) {
+        Objects.requireNonNull(packetClass, "packetClass");
         return byClass.containsKey(packetClass);
     }
 }

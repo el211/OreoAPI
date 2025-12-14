@@ -1,92 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.oreostudios</groupId>
-    <artifactId>OreoAPI</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <!-- ========================= -->
+    <!-- Coordinates (Central)     -->
+    <!-- ========================= -->
+    <groupId>io.github.el211</groupId>
+    <artifactId>oreoapi</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>OreoAPI</name>
+    <description>Infrastructure API for Minecraft servers (RabbitMQ, MongoDB, SyncBus, PacketBus)</description>
+    <url>https://github.com/el211/OreoAPI</url>
 
+    <!-- ========================= -->
+    <!-- Global properties         -->
+    <!-- ========================= -->
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Plugin versions -->
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
+        <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
+        <maven.deploy.plugin.version>3.1.2</maven.deploy.plugin.version>
     </properties>
 
-    <build>
-        <defaultGoal>clean package</defaultGoal>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
+    <!-- ========================= -->
+    <!-- Legal (Central required)  -->
+    <!-- ========================= -->
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
+    <developers>
+        <developer>
+            <id>el211</id>
+            <name>Elias</name>
+            <email>saireelias@gmail.com</email>
+            <url>https://github.com/el211</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/el211/OreoAPI</url>
+        <connection>scm:git:https://github.com/el211/OreoAPI.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:el211/OreoAPI.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!-- ========================= -->
+    <!-- Repositories              -->
+    <!-- ========================= -->
     <repositories>
         <repository>
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-        <repository>
-            <id>smartinvs-repo</id>
-            <url>https://raw.github.com/dominicfeliton/SmartInvs/bukkit-maven-repo</url>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>codemc-releases</id>
-            <url>https://repo.codemc.io/repository/maven-releases/</url>
-        </repository>
-        <repository>
-            <id>codemc-snapshots</id>
-            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
-        </repository>
-        <repository>
-            <id>nexus</id>
-            <name>Lumine Public</name>
-            <url>https://mvn.lumine.io/repository/maven-public/</url>
-        </repository>
     </repositories>
 
+    <!-- ========================= -->
+    <!-- Dependencies              -->
+    <!-- ========================= -->
     <dependencies>
+
+        <!-- Paper API (provided) -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -94,17 +82,156 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- MongoDB -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
             <version>5.1.0</version>
         </dependency>
 
-        <!-- RabbitMQ Java Client -->
+        <!-- RabbitMQ -->
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>5.15.0</version>
         </dependency>
+
+        <!-- Gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
     </dependencies>
+
+    <!-- ========================= -->
+    <!-- Build                     -->
+    <!-- ========================= -->
+    <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+
+            <!-- Compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+
+            <!-- Sources JAR (required by Central) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Javadoc JAR (OPTION C – relaxed) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <failOnWarnings>false</failOnWarnings>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <doclint>none</doclint>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- GPG signing (Central required) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven.gpg.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Central Portal Publisher -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.9.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+
+            <!-- Deploy -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <!-- ========================= -->
+    <!-- Central deployment        -->
+    <!-- ========================= -->
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <url>https://central.sonatype.com/api/v1/publisher/deployments</url>
+        </repository>
+    </distributionManagement>
+
+    <!-- ========================= -->
+    <!-- Profiles                  -->
+    <!-- ========================= -->
+    <profiles>
+
+        <!-- Local dev: no signing -->
+        <profile>
+            <id>local</id>
+            <properties>
+                <gpg.skip>true</gpg.skip>
+            </properties>
+        </profile>
+
+        <!-- Release: signing enabled -->
+        <profile>
+            <id>release</id>
+        </profile>
+
+    </profiles>
+
 </project>
