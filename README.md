@@ -196,7 +196,6 @@ Suggested project layout (recommended)
 - oreoapi-app — example standalone app / proxy integration
 
 FAQ
-
 Q: Do users need to set extra repositories?
 A: No — OreoAPI is published to Maven Central.
 
@@ -204,29 +203,25 @@ Q: Is OreoAPI a Bukkit plugin?
 A: No. It is a library. If you need a Bukkit plugin, create a separate wrapper module.
 
 Q: Why do Noop services throw on publish?
-A: Publishing while the messaging layer is disabled is a configuration error. Throwing prevents silent message loss and helps surface problems early.
+A: Publishing while the messaging layer is disabled is a configuration error. Throwing an error prevents silent message loss and helps surface problems early.
 
 API Reference & Javadoc
+If you’ve published Javadocs or documentation:
 
-Include a link to hosted Javadoc or GitHub Packages if you publish docs. If you want, I can generate a short "public API" section listing the primary interfaces and common method signatures.
-
+Include a link to the hosted Javadoc or GitHub Packages.
+Alternatively, I can generate a quick "public API" section that lists the main interfaces and commonly used method signatures. Let me know if you'd like that.
 License
-
-OreoAPI is released under the MIT License. See LICENSE for details.
+OreoAPI is released under the MIT License.
+See the LICENSE file for details.
 
 Author
-
 Oreo Studios
 Contact: support@oreostudios.info
 
 Acknowledgements
-
 Built for maintainable cross-instance messaging and persistence across Java services and Minecraft ecosystems.
 
 Changelog
-
-See CHANGELOG.md for release notes.
-
----
+See the CHANGELOG.md for release notes.
 
 
