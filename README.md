@@ -4,7 +4,7 @@
 [![Java](https://img.shields.io/badge/Java-21%2B-blue.svg)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-OreoAPI is a lightweight, framework‑agnostic Java library providing clean abstractions for MongoDB, RabbitMQ, and cross‑instance synchronization (publish/subscribe). It is built for Minecraft networks, proxies, backend services, and any Java application that needs reliable structured messaging and optional persistence — shipped as a pure Java artifact on Maven Central.
+OreoAPI is a lightweight, framework‑agnostic Java library providing clean abstractions for MongoDB, RabbitMQ, and cross‑instance synchronization (publish/subscribe). It is built for Minecraft networks, proxies, backend services, and any Java application that needs reliable structured messaging and optional persistence  shipped as a pure Java artifact on Maven Central.
 
 - Group ID: `io.github.el211`  
 - Artifact ID: `oreoapi`  
