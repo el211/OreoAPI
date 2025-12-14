@@ -216,8 +216,8 @@ OreoAPI is released under the MIT License. See LICENSE for details.
 
 Author
 
-Elias — Oreo Studios
-Contact: (add email or GitHub handle)
+Oreo Studios
+Contact: support@oreostudios.info
 
 Acknowledgements
 
