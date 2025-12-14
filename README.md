@@ -229,9 +229,4 @@ See CHANGELOG.md for release notes.
 
 ---
 
-If you'd like, I can:
-- generate a short "Public API" section listing the main interfaces and their method signatures,
-- create a CONTRIBUTING.md or ISSUE templates,
-- generate example wrapper modules (Bukkit/Proxy) or CI badges,
-- or produce a compact GitHub repository description + topics ready to paste into your repo settings.
-```
+
