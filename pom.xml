@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- ========================= -->
-    <!-- Coordinates (Central)     -->
+    <!-- Coordinates (Maven Central)-->
     <!-- ========================= -->
     <groupId>io.github.el211</groupId>
     <artifactId>oreoapi</artifactId>
@@ -18,11 +18,17 @@
     <url>https://github.com/el211/OreoAPI</url>
 
     <!-- ========================= -->
-    <!-- Global properties         -->
+    <!-- Properties                -->
     <!-- ========================= -->
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Dependency versions -->
+        <paper.version>1.21.8-R0.1-SNAPSHOT</paper.version>
+        <mongodb.version>5.1.0</mongodb.version>
+        <rabbitmq.version>5.15.0</rabbitmq.version>
+        <gson.version>2.11.0</gson.version>
 
         <!-- Plugin versions -->
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
@@ -30,10 +36,14 @@
         <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
         <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
         <maven.deploy.plugin.version>3.1.2</maven.deploy.plugin.version>
+        <central.publishing.plugin.version>0.9.0</central.publishing.plugin.version>
+
+        <!-- Option 2: force gpg path -->
+        <gpg.executable>C:\Program Files (x86)\Gpg4win\bin\gpg.exe</gpg.executable>
     </properties>
 
     <!-- ========================= -->
-    <!-- Legal (Central required)  -->
+    <!-- Central required metadata -->
     <!-- ========================= -->
     <licenses>
         <license>
@@ -74,33 +84,25 @@
     <!-- ========================= -->
     <dependencies>
 
-        <!-- Paper API (provided) -->
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.21.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- MongoDB -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>5.1.0</version>
+            <version>${mongodb.version}</version>
         </dependency>
 
         <!-- RabbitMQ -->
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>5.15.0</version>
+            <version>${rabbitmq.version}</version>
         </dependency>
 
         <!-- Gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.11.0</version>
+            <version>${gson.version}</version>
         </dependency>
 
     </dependencies>
@@ -126,10 +128,11 @@
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <release>${java.version}</release>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
-            <!-- Sources JAR (required by Central) -->
+            <!-- Sources JAR (Central required) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -145,7 +148,7 @@
                 </executions>
             </plugin>
 
-            <!-- Javadoc JAR (OPTION C – relaxed) -->
+            <!-- Javadoc JAR (relaxed) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -167,30 +170,28 @@
                 </executions>
             </plugin>
 
-            <!-- GPG signing (Central required) -->
+            <!-- GPG plugin is configured globally but only runs when release profile is enabled -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>${maven.gpg.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <configuration>
+                    <!-- Option 2 -->
+                    <gpgExecutable>${gpg.executable}</gpgExecutable>
+                    <!-- Keep non-interactive possible -->
+                    <useAgent>true</useAgent>
+                </configuration>
             </plugin>
 
             <!-- Central Portal Publisher -->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.9.0</version>
+                <version>${central.publishing.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
+                    <!-- <autoPublish>true</autoPublish> -->
                 </configuration>
             </plugin>
 
@@ -205,7 +206,7 @@
     </build>
 
     <!-- ========================= -->
-    <!-- Central deployment        -->
+    <!-- Central Deployment         -->
     <!-- ========================= -->
     <distributionManagement>
         <repository>
@@ -219,7 +220,7 @@
     <!-- ========================= -->
     <profiles>
 
-        <!-- Local dev: no signing -->
+        <!-- Local: skip signing -->
         <profile>
             <id>local</id>
             <properties>
@@ -227,9 +228,26 @@
             </properties>
         </profile>
 
-        <!-- Release: signing enabled -->
+        <!-- Release: enable signing execution -->
         <profile>
             <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
     </profiles>
